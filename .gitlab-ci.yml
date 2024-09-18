@@ -1,0 +1,22 @@
+image: denoland/deno:alpine
+
+before_script:
+  - echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
+  - apk update
+  - apk add swaks@testing bash perl-net-dns
+
+notify:
+  stage: deploy
+  rules:
+    - if: ($CI_PIPELINE_SOURCE == "schedule" && $job_name == "notify")
+  script:
+    - deno --allow-read --allow-run notify.js
+  environment: production
+
+remind:
+  stage: deploy
+  rules:
+    - if: ($CI_PIPELINE_SOURCE == "schedule" && $job_name == "remind")
+  script:
+    - deno --allow-read --allow-run remind.js
+  environment: production
